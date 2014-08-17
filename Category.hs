@@ -6,6 +6,7 @@ module Category where
 
 import qualified Prelude as P
 import GHC.Prim
+import Data.Constraint
 
 class Category m where
     type Object (m :: k -> k -> *) (a :: k) :: Constraint
@@ -16,3 +17,8 @@ instance Category (->) where
     type Object (->) a = ()
     id = P.id
     (.) = (P..)
+
+instance Category (:-) where
+    type Object (:-) a = ()
+    id = refl
+    (.) = trans
