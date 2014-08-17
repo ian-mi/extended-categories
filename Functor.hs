@@ -21,7 +21,7 @@ class (Category (Domain f domain), Category (Codomain f codomain)) => Functor f 
     fmap :: (Object (Domain f domain) a, Object (Domain f domain) b) => f -> Domain f domain a b -> Codomain f codomain (FMap f a) (FMap f b)
 
 data CompF f g c1 c2 c3 where
-    (:.:) :: (Functor f c2 c3, Functor g c1 c2) => f -> g -> CompF f g c1 c2 c3
+    (:.:) :: (Functor f c2 c3, Functor g c1 c2, Domain f c2 ~ Codomain g c2) => f -> g -> CompF f g c1 c2 c3
 
 instance (Functor f c2 c3, Functor g c1 c2, Codomain g c2 ~ Domain f c2) => Functor (CompF f g (c1 :: KProxy o1) (c2 :: KProxy o2) (c3 :: KProxy o3)) c1 c3 where
     type Domain (CompF f g c1 c2 c3) c1 = Domain g c1
