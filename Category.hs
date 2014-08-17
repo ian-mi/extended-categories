@@ -9,8 +9,8 @@ import GHC.Prim
 
 class Category m where
     type Object (m :: k -> k -> *) (a :: k) :: Constraint
-    id :: m a a
-    (.) :: m b c -> m a b -> m a c
+    id :: Object m a => m a a
+    (.) :: (Object m a, Object m b, Object m c) => m b c -> m a b -> m a c
 
 instance Category (->) where
     type Object (->) a = ()
