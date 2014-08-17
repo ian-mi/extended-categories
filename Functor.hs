@@ -29,7 +29,7 @@ instance (Functor f c2 c3, Functor g c1 c2, Codomain g c2 ~ Domain f c2) => Func
     type FMap (CompF f g c1 c2 c3) (a :: o1) = (FMap f ((FMap g a) :: o2) :: o3)
     objectMap :: forall a. CompF f g c1 c2 c3 -> Tagged a
         (Object (Domain (CompF f g c1 c2 c3) c1) a :- Object (Codomain (CompF f g c1 c2 c3) c3) (FMap (CompF f g c1 c2 c3) a))
-    objectMap (f :.: g) = Tagged (trans (proxy (objectMap f) (Proxy :: Proxy (FMap g a))) (proxy (objectMap g) (Proxy :: Proxy a)))
+    objectMap (f :.: g) = Tagged (proxy (objectMap f) (Proxy :: Proxy (FMap g a)) . proxy (objectMap g) (Proxy :: Proxy a))
     fmap :: forall a b. (Object (Domain (CompF f g c1 c2 c3) c1) a, Object (Domain (CompF f g c1 c2 c3) c1) b) =>
         CompF f g c1 c2 c3 -> Domain (CompF f g c1 c2 c3) c1 a b -> Codomain (CompF f g c1 c2 c3) c3 (FMap (CompF f g c1 c2 c3) a) (FMap (CompF f g c1 c2 c3) b)
     fmap (f :.: g) = (fmap f \\ ga *** gb) . fmap g where
