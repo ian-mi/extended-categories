@@ -9,7 +9,8 @@ import Category
 import Functor
 import TerminalMorphism
 
-data (c1 :><: c2) a b = (:><:) (c1 (L a) (L b)) (c2 (R a) (R b))
+data (c1 :><: c2) a b where
+    (:><:) :: (a ~ '(L a, R a), b ~ '(L b, R b))  => c1 (L a) (L b) -> c2 (R a) (R b) -> (c1 :><: c2) a b
 
 type family L t where L '(a, b) = a
 type family R t where R '(a, b) = b
@@ -17,6 +18,8 @@ type family R t where R '(a, b) = b
 instance (Category c1, Category c2) => Category (c1 :><: c2) where
     type Object (c1 :><: c2) a = (Object c1 (L a), Object c2 (R a), a ~ '(L a, R a))
     id = id :><: id
+    observeObjects (f :><: g)
+        | Dict <- observeObjects f, Dict <- observeObjects g = Dict
     (f1 :><: f2) . (g1 :><: g2) = (f1 . g1) :><: (f2 . g2)
 
 data Diag c where Diag :: Category c => Diag c
@@ -45,11 +48,15 @@ proj2 = Tagged p where
     t :: (c :><: c) '(a >< b, a >< b) '(a, b)
     t = proxy terminalMorphism (Proxy :: Proxy '(Diag c, a >< b)) \\ proxy univProduct (Proxy :: Proxy '(c, a, b))
 
-(&&&) :: forall c a b1 b2. (ProductCategory c, Object c a, Object c b1, Object c b2) => c a b1 -> c a b2 -> c a (b1 >< b2)
-f &&& g = proxy terminalFactorization (Proxy :: Proxy (Diag c)) (f :><: g) \\ proxy univProduct (Proxy :: Proxy '(c, b1, b2))
+(&&&) :: forall c a b1 b2. ProductCategory c => c a b1 -> c a b2 -> c a (b1 >< b2)
+f &&& g
+    | Dict <- observeObjects f, Dict <- observeObjects g
+        = proxy terminalFactorization (Proxy :: Proxy (Diag c)) (f :><: g) \\ proxy univProduct (Proxy :: Proxy '(c, b1, b2))
 
-(***) :: forall c a1 a2 b1 b2. (ProductCategory c, Object c a1, Object c a2, Object c b1, Object c b2) => c a1 b1 -> c a2 b2 -> c (a1 >< a2) (b1 >< b2)
-f *** g = (f . (proxy proj1 (Proxy :: Proxy a2))) &&& (g . (proxy proj2 (Proxy :: Proxy a1))) \\ proxy productObjectMap (Proxy :: Proxy '(c, a1, a2))
+(***) :: forall c a1 a2 b1 b2. ProductCategory c => c a1 b1 -> c a2 b2 -> c (a1 >< a2) (b1 >< b2)
+f *** g
+    | Dict <- observeObjects f, Dict <- observeObjects g
+        = (f . (proxy proj1 (Proxy :: Proxy a2))) &&& (g . (proxy proj2 (Proxy :: Proxy a1)))
 
 data ProductF c where ProductF :: ProductCategory c => ProductF c
 

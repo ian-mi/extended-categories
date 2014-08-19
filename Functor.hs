@@ -12,7 +12,7 @@ class (Category (Domain f domain), Category (Codomain f codomain)) => Functor f 
     type Codomain f codomain :: o2 -> o2 -> *
     type FMap f (a :: o1) :: o2
     objectMap :: f -> Tagged a (Object (Domain f domain) a :- Object (Codomain f codomain) (FMap f a))
-    fmap :: (Object (Domain f domain) a, Object (Domain f domain) b) => f -> Domain f domain a b -> Codomain f codomain (FMap f a) (FMap f b)
+    fmap :: f -> Domain f domain a b -> Codomain f codomain (FMap f a) (FMap f b)
 
 data CompF f g c1 c2 c3 where
     (:.:) :: (Functor f c2 c3, Functor g c1 c2, Domain f c2 ~ Codomain g c2) => f -> g -> CompF f g c1 c2 c3
@@ -24,11 +24,7 @@ instance (Functor f c2 c3, Functor g c1 c2, Codomain g c2 ~ Domain f c2) => Func
     objectMap :: forall a. CompF f g c1 c2 c3 -> Tagged a
         (Object (Domain (CompF f g c1 c2 c3) c1) a :- Object (Codomain (CompF f g c1 c2 c3) c3) (FMap (CompF f g c1 c2 c3) a))
     objectMap (f :.: g) = Tagged (proxy (objectMap f) (Proxy :: Proxy (FMap g a)) . proxy (objectMap g) (Proxy :: Proxy a))
-    fmap :: forall a b. (Object (Domain (CompF f g c1 c2 c3) c1) a, Object (Domain (CompF f g c1 c2 c3) c1) b) =>
-        CompF f g c1 c2 c3 -> Domain (CompF f g c1 c2 c3) c1 a b -> Codomain (CompF f g c1 c2 c3) c3 (FMap (CompF f g c1 c2 c3) a) (FMap (CompF f g c1 c2 c3) b)
-    fmap (f :.: g) = (fmap f \\ ga *** gb) . fmap g where
-        ga = proxy (objectMap g) (Proxy :: Proxy a)
-        gb = proxy (objectMap g) (Proxy :: Proxy b)
+    fmap (f :.: g) = fmap f . fmap g
 
 data CanonicalF f where
     CanonicalF :: P.Functor f => CanonicalF f
