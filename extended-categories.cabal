@@ -16,7 +16,7 @@ cabal-version:       >=1.10
 library
   exposed-modules:     Functor, Product, Category, TerminalMorphism
   -- other-modules:       
-  other-extensions:    PolyKinds, DataKinds, TypeFamilies, ConstraintKinds, InstanceSigs, ScopedTypeVariables, MultiParamTypeClasses, FunctionalDependencies, FlexibleContexts, FlexibleInstances, UndecidableInstances, TypeOperators, GADTs
+  default-extensions:    PolyKinds, DataKinds, TypeFamilies, ConstraintKinds, InstanceSigs, ScopedTypeVariables, MultiParamTypeClasses, FunctionalDependencies, FlexibleContexts, FlexibleInstances, UndecidableInstances, TypeOperators, GADTs
   build-depends:       base >=4.7 && <4.8, constraints >=0.3 && <0.4, tagged >=0.7 && <0.8, ghc-prim >=0.3 && <0.4
   -- hs-source-dirs:      
   default-language:    Haskell2010
