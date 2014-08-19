@@ -1,8 +1,3 @@
-{-# LANGUAGE PolyKinds, DataKinds, TypeFamilies, ConstraintKinds #-}
-{-# LANGUAGE InstanceSigs, ScopedTypeVariables #-}
-{-# LANGUAGE TypeOperators, GADTs, MultiParamTypeClasses, FunctionalDependencies #-}
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, UndecidableInstances #-}
-
 module TerminalMorphism where
 
 import qualified Prelude as P

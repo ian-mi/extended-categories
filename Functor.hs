@@ -1,9 +1,3 @@
-{-# LANGUAGE PolyKinds, DataKinds, TypeFamilies, ConstraintKinds #-}
-{-# LANGUAGE InstanceSigs, ScopedTypeVariables #-}
-{-# LANGUAGE MultiParamTypeClasses, FunctionalDependencies #-}
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, UndecidableInstances #-}
-{-# LANGUAGE TypeOperators, GADTs #-}
-
 module Functor where
 
 import qualified Prelude as P

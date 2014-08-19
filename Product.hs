@@ -1,8 +1,3 @@
-{-# LANGUAGE PolyKinds, DataKinds, TypeFamilies, ConstraintKinds #-}
-{-# LANGUAGE InstanceSigs, ScopedTypeVariables #-}
-{-# LANGUAGE TypeOperators, GADTs, MultiParamTypeClasses #-}
-{-# LANGUAGE FlexibleContexts, FlexibleInstances, UndecidableInstances #-}
-
 module Product where
 
 import qualified Prelude as P
