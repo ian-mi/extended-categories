@@ -2,10 +2,12 @@ module TerminalMorphism where
 
 import qualified Prelude as P
 import Data.Tagged
+import Data.Proxy
 
 import Category
 import Functor
 
-class (Functor f c1 c2, Object (Domain f c1) a, Object (Codomain f c2) x) => TerminalMorphism f a x c1 c2 | f -> c1, f -> c2 where
-    terminalMorphism :: Tagged '(f, a) (Codomain f c2 (FMap f a) x)
-    terminalFactorization :: Object (Domain f c1) y => Tagged f (Codomain f c2 (FMap f y) x -> Domain f c1 y a)
+class (Functor f ('KProxy :: KProxy k1) ('KProxy :: KProxy k2), Object (Domain f 'KProxy) a, Object (Codomain f 'KProxy) x) =>
+        TerminalMorphism f (a :: k1) (x :: k2) where
+    terminalMorphism :: Tagged '(f, a) (Codomain f 'KProxy (FMap f a) x)
+    terminalFactorization :: Object (Domain f 'KProxy) y => Tagged f (Codomain f 'KProxy (FMap f y) x -> Domain f 'KProxy y a)

@@ -34,7 +34,7 @@ instance Category c => Functor (Diag (c :: k -> k -> *)) ('KProxy :: KProxy k) (
 class Category c => ProductCategory (c :: k -> k -> *) where
     type (><) (a :: k) (b :: k) :: k
     productObjectMap :: Tagged '(c, a, b) ((Object c a, Object c b) :- Object c (a >< b))
-    univProduct :: forall (a :: k) (b :: k). Tagged '(c, a, b) ((Object c a, Object c b) :- TerminalMorphism (Diag c) (a >< b) '(a, b) 'KProxy 'KProxy)
+    univProduct :: forall (a :: k) (b :: k). Tagged '(c, a, b) ((Object c a, Object c b) :- TerminalMorphism (Diag c) (a >< b) '(a, b))
 
 proj1 :: forall a b c. (ProductCategory c, Object c a, Object c b) => Tagged b (c (a >< b) a)
 proj1 = Tagged p where
@@ -69,7 +69,7 @@ instance ProductCategory (c :: k -> k -> *) => Functor (ProductF c) ('KProxy :: 
     objectMap ProductF = Tagged (proxy productObjectMap (Proxy :: Proxy '(c, L a, R a)) . Sub Dict)
     fmap ProductF (f :><: g) = f *** g
 
-instance TerminalMorphism (Diag (->)) (a, b) '(a, b) ('KProxy :: KProxy *) ('KProxy :: KProxy (*, *)) where
+instance TerminalMorphism (Diag (->)) (a, b) '(a, b) where
     terminalMorphism = Tagged (P.fst :><: P.snd)
     terminalFactorization  = Tagged (\(f :><: g) z -> (f z, g z))
 
