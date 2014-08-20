@@ -77,3 +77,12 @@ instance ProductCategory (->) where
     type (><) a b = (a, b)
     productObjectMap = Tagged (Sub Dict)
     univProduct = Tagged (Sub Dict)
+
+instance TerminalMorphism (Diag (:-)) ((a :: Constraint), b) '(a, b) where
+    terminalMorphism = Tagged (Sub Dict :><: Sub Dict)
+    terminalFactorization = Tagged (\(f :><: g) -> Sub (Dict \\ f \\ g))
+
+instance ProductCategory (:-) where
+    type (><) a b = ((a, b) :: Constraint)
+    productObjectMap = Tagged (Sub Dict)
+    univProduct = Tagged (Sub Dict)
