@@ -1,6 +1,5 @@
 module Category.Product where
 
-import qualified Prelude as P
 import Data.Constraint
 import Data.Proxy
 import Data.Tagged

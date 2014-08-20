@@ -1,6 +1,5 @@
 module TerminalMorphism where
 
-import qualified Prelude as P
 import Data.Tagged
 import Data.Proxy
 
