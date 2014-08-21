@@ -43,9 +43,9 @@ instance ProductCategory (c :: k -> k -> *) => Functor (ProductF c) ('KProxy :: 
     type Domain (ProductF c) 'KProxy = c :><: c
     type Codomain (ProductF c) 'KProxy = c
     type FMap (ProductF c) (a :: (k, k)) = L a >< R a
-    objectMap :: forall a. ProductF c -> Tagged a
+    objectMap :: forall a. Tagged '(ProductF c, a)
         (Object (Domain (ProductF c) ('KProxy :: KProxy (k, k))) a :- Object (Codomain (ProductF c) ('KProxy :: KProxy k)) (FMap (ProductF c) a))
-    objectMap ProductF = Tagged (proxy productObjectMap (Proxy :: Proxy '(c, L a, R a)) . Sub Dict)
+    objectMap = Tagged (proxy productObjectMap (Proxy :: Proxy '(c, L a, R a)) . Sub Dict)
     fmap ProductF (f :><: g) = f *** g
 
 instance TerminalMorphism (Diag (->)) (a, b) '(a, b) where

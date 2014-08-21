@@ -26,5 +26,5 @@ instance Category c => Functor (Diag (c :: k -> k -> *)) ('KProxy :: KProxy k) (
     type Domain (Diag c) 'KProxy = c
     type Codomain (Diag c) 'KProxy = c :><: c
     type FMap (Diag c) (a :: k) = '(a, a)
-    objectMap Diag = Tagged (Sub Dict)
+    objectMap = Tagged (Sub Dict)
     fmap Diag f = f :><: f
