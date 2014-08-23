@@ -20,7 +20,8 @@ fmap :: forall f (a :: o1) (b :: o1). Functor f ('KProxy :: KProxy (o1 -> o2)) =
 fmap _ = proxy morphMap (Proxy :: Proxy f)
 
 data Comp (k :: KProxy o2) (f :: *) (g :: *) where
-    (:.:) :: (Functor f ('KProxy :: KProxy (o2 -> o3)), Functor g ('KProxy :: KProxy (o1 -> o2))) => f -> g -> Comp ('KProxy :: KProxy o2) f g
+    (:.:) :: (Functor f ('KProxy :: KProxy (o2 -> o3)), Functor g ('KProxy :: KProxy (o1 -> o2)), (Domain f :: o2 -> o2 -> *) ~ Codomain g) =>
+        f -> g -> Comp ('KProxy :: KProxy o2) f g
 
 instance (Functor f ('KProxy :: KProxy (o2 -> o3)), Functor g ('KProxy :: KProxy (o1 -> o2)), (Domain f :: o2 -> o2 -> *) ~ Codomain g)
         => Functor (Comp ('KProxy :: KProxy o2) f g) ('KProxy :: KProxy (o1 -> o3)) where
