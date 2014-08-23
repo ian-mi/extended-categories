@@ -22,8 +22,8 @@ instance (Category c1, Category c2) => Category (c1 :><: c2) where
 
 data Diag c where Diag :: Category c => Diag c
 
-instance Category c => Functor (Diag (c :: k -> k -> *)) ('KProxy :: KProxy k) ('KProxy :: KProxy (k, k)) where
-    type Domain (Diag c) 'KProxy = c
-    type Codomain (Diag c) 'KProxy = c :><: c
+instance Category c => Functor (Diag (c :: k -> k -> *)) ('KProxy :: KProxy (k -> (k, k))) where
+    type Domain (Diag c) = c
+    type Codomain (Diag c) = c :><: c
     type FMap (Diag c) (a :: k) = '(a, a)
-    morphismMap = Tagged (\f -> f :><: f)
+    morphMap = Tagged (\f -> f :><: f)

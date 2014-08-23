@@ -33,17 +33,17 @@ f &&& g
         = proxy terminalFactorization (Proxy :: Proxy (Diag c)) (f :><: g) \\ proxy univProduct (Proxy :: Proxy '(c, b1, b2))
 
 (***) :: forall c a1 a2 b1 b2. ProductCategory c => c a1 b1 -> c a2 b2 -> c (a1 >< a2) (b1 >< b2)
-f *** g = proxy morphismMap (Proxy :: Proxy (ProductF c)) (f :><: g)
+f *** g = proxy morphMap (Proxy :: Proxy (ProductF c)) (f :><: g)
 
 data ProductF c where ProductF :: ProductCategory c => ProductF c
 
-instance ProductCategory (c :: k -> k -> *) => Functor (ProductF c) ('KProxy :: KProxy (k, k)) ('KProxy :: KProxy k) where
-    type Domain (ProductF c) 'KProxy = c :><: c
-    type Codomain (ProductF c) 'KProxy = c
+instance ProductCategory (c :: k -> k -> *) => Functor (ProductF c) ('KProxy :: KProxy ((k, k) -> k)) where
+    type Domain (ProductF c) = c :><: c
+    type Codomain (ProductF c) = c
     type FMap (ProductF c) (a :: (k, k)) = L a >< R a
-    morphismMap :: forall a b. Tagged (ProductF c)
-        (Domain (ProductF c) ('KProxy :: KProxy (k, k)) a b -> Codomain (ProductF c) ('KProxy :: KProxy k) (FMap (ProductF c) a) (FMap (ProductF c) b))
-    morphismMap = Tagged m where
+    morphMap :: forall (a :: (k, k)) (b :: (k, k)). Tagged (ProductF c)
+        (Domain (ProductF c) a b -> Codomain (ProductF c) (FMap (ProductF c) a :: k) (FMap (ProductF c) b :: k))
+    morphMap = Tagged m where
         m (f :><: g)
             | Dict <- observeObjects f, Dict <- observeObjects g = (f . (proxy proj1 (Proxy :: Proxy (R a)))) &&& (g . (proxy proj2 (Proxy :: Proxy (L a))))
 

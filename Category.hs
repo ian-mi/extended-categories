@@ -4,8 +4,8 @@ import qualified Prelude as P
 import GHC.Prim
 import Data.Constraint
 
-class Category m where
-    type Object (m :: k -> k -> *) (a :: k) :: Constraint
+class Category (m :: k -> k -> *) where
+    type Object m (a :: k) :: Constraint
     id :: Object m a => m a a
     observeObjects :: m a b -> Dict (Object m a, Object m b)
     (.) :: m b c -> m a b -> m a c
