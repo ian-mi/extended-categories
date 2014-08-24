@@ -30,6 +30,14 @@ instance (Functor f ('KProxy :: KProxy (o2 -> o3)), Functor g ('KProxy :: KProxy
     type Codomain (Comp 'KProxy f g) = Codomain f
     morphMap = Tagged (proxy morphMap (Proxy :: Proxy f) . proxy morphMap (Proxy :: Proxy g))
 
+data IdentityF c where IdentityF :: Category c => IdentityF c
+
+instance Category c => Functor (IdentityF (c :: k -> k -> *)) ('KProxy :: KProxy (k -> k)) where
+    type Domain (IdentityF c) = c
+    type Codomain (IdentityF c) = c
+    type FMap (IdentityF c) (a :: k) = a
+    morphMap = Tagged id
+
 data CanonicalF (f :: * -> *) where
     CanonicalF :: P.Functor f => CanonicalF f
 
