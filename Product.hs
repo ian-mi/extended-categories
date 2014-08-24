@@ -8,7 +8,9 @@ import Data.Tagged
 import Category
 import Category.Product
 import Functor
+import Terminal
 import TerminalMorphism
+import Monoidal
 
 class Category c => ProductCategory (c :: k -> k -> *) where
     type (><) (a :: k) (b :: k) :: k
@@ -46,6 +48,10 @@ instance ProductCategory (c :: k -> k -> *) => Functor (ProductF c) ('KProxy :: 
     morphMap = Tagged m where
         m (f :><: g)
             | Dict <- observeObjects f, Dict <- observeObjects g = (f . (proxy proj1 (Proxy :: Proxy (R a)))) &&& (g . (proxy proj2 (Proxy :: Proxy (L a))))
+
+instance (ProductCategory c, Terminal c) => Monoidal c where
+    type Mu c = ProductF c
+    type I c = T c
 
 instance TerminalMorphism (Diag (->)) (a, b) '(a, b) where
     terminalMorphism = Tagged (P.fst :><: P.snd)

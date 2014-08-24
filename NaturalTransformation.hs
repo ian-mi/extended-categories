@@ -7,6 +7,7 @@ import Data.Proxy
 import Category
 import Category.Product
 import Functor
+import Monoidal
 
 data NatTr (c1 :: o1 -> o1 -> *) (c2 :: o2 -> o2 -> *) (f :: *) (g :: *) where
     NatTr :: (Object (NatTr c1 c2) f, Object (NatTr c1 c2) g) =>
@@ -40,3 +41,7 @@ compNat (NatTr t1) (NatTr t2) = NatTr t3 where
     t3 = Tagged (m1 . m2) where
         m2 = proxy morphMap (Proxy :: Proxy f1) (proxy t2 (Proxy :: Proxy a))
         m1 = proxy t1 (Proxy :: Proxy (FMap g2 a)) \\ proxy objectMap (Proxy :: Proxy '(g2, a))
+
+instance Category c => Monoidal (NatTr c c) where
+    type Mu (NatTr c c) = CompFF c c c
+    type I (NatTr c c) = IdentityF c
