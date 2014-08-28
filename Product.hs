@@ -14,7 +14,6 @@ import Monoidal
 
 class Category c => ProductCategory (c :: k -> k -> *) where
     type (><) (a :: k) (b :: k) :: k
-    productObjectMap :: Tagged '(c, a, b) ((Object c a, Object c b) :- Object c (a >< b))
     univProduct :: forall (a :: k) (b :: k). Tagged '(c, a, b) ((Object c a, Object c b) :- TerminalMorphism (Diag c) (a >< b) '(a, b))
 
 proj1 :: forall a b c. (ProductCategory c, Object c a, Object c b) => Tagged b (c (a >< b) a)
@@ -59,7 +58,6 @@ instance TerminalMorphism (Diag (->)) (a, b) '(a, b) where
 
 instance ProductCategory (->) where
     type (><) a b = (a, b)
-    productObjectMap = Tagged (Sub Dict)
     univProduct = Tagged (Sub Dict)
 
 instance TerminalMorphism (Diag (:-)) ((a :: Constraint), b) '(a, b) where
@@ -68,5 +66,4 @@ instance TerminalMorphism (Diag (:-)) ((a :: Constraint), b) '(a, b) where
 
 instance ProductCategory (:-) where
     type (><) a b = ((a, b) :: Constraint)
-    productObjectMap = Tagged (Sub Dict)
     univProduct = Tagged (Sub Dict)
