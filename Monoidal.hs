@@ -7,10 +7,9 @@ import Category
 import Category.Product
 import Functor
 
-class (Category c, Functor (Mu c) ('KProxy :: KProxy ((k, k) -> k)), Domain (Mu c) ~ (c :><: c), Codomain (Mu c) ~ c, Object c (I c)) =>
-        Monoidal (c :: k -> k -> *) where
-    type Mu c
-    type I c :: k
+class (Category c, FunctorOf mu (c :><: c) c) => Monoidal (c :: o -> o -> *) mu | mu -> c where
+    type I mu :: o
 
-(<>) :: forall c a1 a2 b1 b2. Monoidal c => c a1 b1 -> c a2 b2 -> c (FMap (Mu c) '(a1, a2)) (FMap (Mu c) '(b1, b2))
-f <> g = proxy morphMap (Proxy :: Proxy (Mu c)) (f :><: g)
+(<>) :: forall (c :: o -> o -> *) mu a1 a2 b1 b2. Monoidal c mu => c a1 b1 -> c a2 b2 -> Tagged mu (c (FMap mu '(a1, a2)) (FMap mu '(b1, b2)))
+f <> g = Tagged (proxy morphMap (Proxy :: Proxy mu) (f :><: g))
+

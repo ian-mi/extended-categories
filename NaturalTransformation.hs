@@ -42,6 +42,5 @@ compNat (NatTr t1) (NatTr t2) = NatTr t3 where
         m2 = proxy morphMap (Proxy :: Proxy f1) (proxy t2 (Proxy :: Proxy a))
         m1 = proxy t1 (Proxy :: Proxy (FMap g2 a)) \\ proxy objectMap (Proxy :: Proxy '(g2, a))
 
-instance Category c => Monoidal (NatTr c c) where
-    type Mu (NatTr c c) = CompFF c c c
-    type I (NatTr c c) = IdentityF c
+instance Category c => Monoidal (NatTr c c) (CompFF c c c) where
+    type I (CompFF c c c) = IdentityF c

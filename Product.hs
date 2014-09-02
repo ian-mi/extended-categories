@@ -48,9 +48,8 @@ instance ProductCategory (c :: k -> k -> *) => Functor (ProductF c) ('KProxy :: 
         m (f :><: g)
             | Dict <- observeObjects f, Dict <- observeObjects g = (f . (proxy proj1 (Proxy :: Proxy (R a)))) &&& (g . (proxy proj2 (Proxy :: Proxy (L a))))
 
-instance (ProductCategory c, Terminal c) => Monoidal c where
-    type Mu c = ProductF c
-    type I c = T c
+instance (ProductCategory c, Terminal c) => Monoidal c (ProductF c) where
+    type I (ProductF c) = T c
 
 instance TerminalMorphism (Diag (->)) (a, b) '(a, b) where
     terminalMorphism = Tagged (P.fst :><: P.snd)
