@@ -31,6 +31,12 @@ objectMap = Tagged (Sub (case observeObjects (proxy morphMap (Proxy :: Proxy f) 
 fmap :: forall f (a :: o1) (b :: o1). Functor f ('KProxy :: KProxy (o1 -> o2)) => f -> Domain f a b -> Codomain f (FMap f a :: o2) (FMap f b :: o2)
 fmap _ = proxy morphMap (Proxy :: Proxy f)
 
+type EndoFunctor f = (Functor f ('KProxy :: KProxy (k -> k)), (Domain f :: k -> k -> *) ~ Codomain f)
+
+type EndoFunctorOf f (c :: k -> k -> *) = (Functor f ('KProxy :: KProxy (k -> k)), Domain f ~ c, Codomain f ~ c)
+
+type FunctorOf f (c1 :: o1 -> o1 -> *) (c2 :: o2 -> o2 -> *) = (Functor f ('KProxy :: KProxy (o1 -> o2)), Domain f ~ c1, Codomain f ~ c2)
+
 -- |The composition of functors. The type variable @k@ is a proxy for the kind of the objects of the codomain of @g@.
 data Comp (k :: KProxy o2) (f :: *) (g :: *) where
     (:.:) :: (Functor f ('KProxy :: KProxy (o2 -> o3)), Functor g ('KProxy :: KProxy (o1 -> o2)), (Domain f :: o2 -> o2 -> *) ~ Codomain g) =>
