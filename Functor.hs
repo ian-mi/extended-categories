@@ -6,6 +6,7 @@ import Data.Proxy
 import Data.Tagged
 
 import Category
+import qualified Functor.Implicit as I
 
 -- |The class of functors @f@ from @Domain f@ to @Codomain f@. Rather than
 -- indexing functors on the type of their object mapping, Functor is indexed on
@@ -51,12 +52,10 @@ instance Category c => Functor (IdentityF (c :: k -> k -> *)) ('KProxy :: KProxy
     type FMap (IdentityF c) (a :: k) = a
     morphMap = Tagged id
 
--- |Functors derived from Prelude's Functor.
-data CanonicalF (f :: * -> *) where
-    CanonicalF :: P.Functor f => CanonicalF f
+data Ftag f where Ftag :: I.Functor f => Ftag f
 
-instance P.Functor f => Functor (CanonicalF f) ('KProxy :: KProxy (* -> *)) where
-    type FMap (CanonicalF f) a = f a
-    type Domain (CanonicalF f) = (->)
-    type Codomain (CanonicalF f) = (->)
-    morphMap = Tagged P.fmap
+instance I.Functor f => Functor (Ftag (f :: o1 -> o2)) ('KProxy :: KProxy (o1 -> o2)) where
+    type Domain (Ftag f) = I.Domain f
+    type Codomain (Ftag f) = I.Codomain f
+    type FMap (Ftag f) a = f a
+    morphMap = Tagged I.fmap
