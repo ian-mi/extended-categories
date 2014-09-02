@@ -1,5 +1,5 @@
 name:                extended-categories
-version:             0.1.0
+version:             0.1.1
 synopsis:       Extended Categories
 description:    An implementation of category theory which makes use of GHC's enriched kind system.
 homepage:            github.com/ian-mi/extended-categories
@@ -21,7 +21,7 @@ source-repository head
 source-repository this
         type: git
         location: git@github.com:ian-mi/extended-categories.git
-        tag: 0.1.0
+        tag: 0.1.1
 
 library
   exposed-modules:     Category, Category.Product, Functor, Functor.Implicit, Product, Terminal, TerminalMorphism, NaturalTransformation, Monoidal
