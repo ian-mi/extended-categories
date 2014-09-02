@@ -9,7 +9,7 @@ import Category
 import Category.Product
 import Functor
 import Terminal
-import TerminalMorphism
+import Universal
 import Monoidal
 
 class Category c => ProductCategory (c :: k -> k -> *) where
