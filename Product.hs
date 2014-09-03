@@ -16,6 +16,12 @@ class Category c => ProductCategory (c :: k -> k -> *) where
     type Product c (a :: k) (b :: k) :: k
     univProduct :: forall (a :: k) (b :: k). Tagged '(c, a, b) ((Object c a, Object c b) :- TerminalMorphism (Diag c) (Product c a b) '(a, b))
 
+proj :: forall a b c. (ProductCategory c, Object c a, Object c b) => (c (Product c a b) a, c (Product c a b) b)
+proj = (l, r) where
+    l :><: r = t
+    t :: (c :><: c) '(Product c a b, Product c a b) '(a, b)
+    t = proxy terminalMorphism (Proxy :: Proxy '(Diag c, Product c a b)) \\ proxy univProduct (Proxy :: Proxy '(c, a, b))
+
 proj1 :: forall a b c. (ProductCategory c, Object c a, Object c b) => Tagged b (c (Product c a b) a)
 proj1 = Tagged p where
     p :><: _ = t
@@ -33,20 +39,17 @@ f &&& g
     | Dict <- observeObjects f, Dict <- observeObjects g
         = proxy terminalFactorization (Proxy :: Proxy (Diag c)) (f :><: g) \\ proxy univProduct (Proxy :: Proxy '(c, b1, b2))
 
-(***) :: forall c a1 a2 b1 b2. ProductCategory c => c a1 b1 -> c a2 b2 -> c (Product c a1 a2) (Product c b1 b2)
-f *** g = proxy morphMap (Proxy :: Proxy (ProductF c)) (f :><: g)
+(***) :: ProductCategory c => c a1 b1 -> c a2 b2 -> c (Product c a1 a2) (Product c b1 b2)
+f *** g
+    | Dict <- observeObjects f, Dict <- observeObjects g = let (l, r) = proj in (f . l) &&& (g . r)
 
-data ProductF c where ProductF :: ProductCategory c => ProductF c
+data ProductF (c :: o -> o -> *)
 
-instance ProductCategory (c :: k -> k -> *) => Functor (ProductF c) ('KProxy :: KProxy ((k, k) -> k)) where
+instance ProductCategory c => Functor (ProductF (c :: o -> o -> *)) ('KProxy :: KProxy ((o, o) -> o)) where
     type Domain (ProductF c) = c :><: c
     type Codomain (ProductF c) = c
-    type FMap (ProductF c) (a :: (k, k)) = Product c (L a) (R a) 
-    morphMap :: forall (a :: (k, k)) (b :: (k, k)). Tagged (ProductF c)
-        (Domain (ProductF c) a b -> Codomain (ProductF c) (FMap (ProductF c) a :: k) (FMap (ProductF c) b :: k))
-    morphMap = Tagged m where
-        m (f :><: g)
-            | Dict <- observeObjects f, Dict <- observeObjects g = (f . (proxy proj1 (Proxy :: Proxy (R a)))) &&& (g . (proxy proj2 (Proxy :: Proxy (L a))))
+    type FMap (ProductF c) '(a, b) = Product c a b
+    morphMap = Tagged (\(f :><: g) -> f *** g)
 
 instance (ProductCategory c, Terminal c) => Monoidal c (ProductF c) where
     type I (ProductF c) = T c
