@@ -57,12 +57,11 @@ instance Category c => Functor (IdentityF (c :: k -> k -> *)) ('KProxy :: KProxy
     type FMap (IdentityF c) (a :: k) = a
     morphMap = Tagged id
 
--- |Functors derived from Prelude's Functor.
-data CanonicalF (f :: * -> *) where
-    CanonicalF :: P.Functor f => CanonicalF f
+-- |Functors from Prelude.Functor
+data Ftag f where Ftag :: P.Functor f => Ftag f
 
-instance P.Functor f => Functor (CanonicalF f) ('KProxy :: KProxy (* -> *)) where
-    type FMap (CanonicalF f) a = f a
-    type Domain (CanonicalF f) = (->)
-    type Codomain (CanonicalF f) = (->)
+instance P.Functor f => Functor (Ftag f) ('KProxy :: KProxy (* -> *)) where
+    type Domain (Ftag f) = (->)
+    type Codomain (Ftag f) = (->)
+    type FMap (Ftag f) a = f a
     morphMap = Tagged P.fmap
