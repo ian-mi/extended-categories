@@ -30,3 +30,12 @@ instance Category (:-) where
     id = refl
     observeObjects = P.const Dict
     (.) = trans
+
+-- |Dual categories
+newtype Op c a b = Op {unOp :: c b a}
+
+instance Category c => Category (Op c) where
+    id = Op id
+    (Op f) . (Op g) = Op (g . f)
+    type Object (Op c) a = Object c a
+    observeObjects (Op c) = case observeObjects c of Dict -> Dict
