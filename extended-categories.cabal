@@ -24,7 +24,7 @@ source-repository this
         tag: 0.1.1
 
 library
-  exposed-modules:     Category, Category.Product, Functor, Functor.Implicit, Universal, Product, Coproduct, Terminal, NaturalTransformation, Monoidal
+  exposed-modules:     Category, Category.Product, Functor, Universal, Product, Coproduct, Terminal, NaturalTransformation, Monoidal
   -- other-modules:       
   default-extensions:    PolyKinds, DataKinds, TypeFamilies, ConstraintKinds, InstanceSigs, ScopedTypeVariables, MultiParamTypeClasses, FunctionalDependencies, FlexibleContexts, FlexibleInstances, UndecidableInstances, TypeOperators, GADTs, NoImplicitPrelude, RankNTypes
   build-depends:       base >=4.7 && <4.8, constraints >=0.3 && <0.5, tagged >=0.7 && <0.8, ghc-prim >=0.3 && <0.4
