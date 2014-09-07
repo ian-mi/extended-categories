@@ -14,7 +14,7 @@ data NatTr (c1 :: o1 -> o1 -> *) (c2 :: o2 -> o2 -> *) (f :: *) (g :: *) where
         (forall (a :: o1). Object c1 a => Tagged a (c2 (FMap f a :: o2) (FMap g a :: o2))) -> NatTr (c1 :: o1 -> o1 -> *) (c2 :: o2 -> o2 -> *) f g
 
 instance (Category c1, Category c2) => Category (NatTr (c1 :: o1 -> o1 -> *) (c2 :: o2 -> o2 -> *)) where
-    type Object (NatTr c1 c2) f = (Functor f ('KProxy :: KProxy (o1 -> o2)), Domain f ~ c1, Codomain f ~ c2)
+    type Object (NatTr c1 c2) f = FunctorOf f c1 c2
     observeObjects (NatTr _) = Dict
     id :: forall f. Object (NatTr c1 c2) f => NatTr c1 c2 f f
     id = NatTr f where
