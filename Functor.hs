@@ -41,6 +41,8 @@ data Comp (k :: KProxy o2) (f :: *) (g :: *) where
     (:.:) :: (Functor f ('KProxy :: KProxy (o2 -> o3)), Functor g ('KProxy :: KProxy (o1 -> o2)), (Domain f :: o2 -> o2 -> *) ~ Codomain g) =>
         f -> g -> Comp ('KProxy :: KProxy o2) f g
 
+type f :.: g = Comp ('KProxy :: KProxy *) f g
+
 instance (Functor f ('KProxy :: KProxy (o2 -> o3)), Functor g ('KProxy :: KProxy (o1 -> o2)), (Domain f :: o2 -> o2 -> *) ~ Codomain g)
         => Functor (Comp ('KProxy :: KProxy o2) f g) ('KProxy :: KProxy (o1 -> o3)) where
     type FMap (Comp ('KProxy :: KProxy o2) f g) a = FMap f (FMap g a :: o2)
@@ -50,6 +52,8 @@ instance (Functor f ('KProxy :: KProxy (o2 -> o3)), Functor g ('KProxy :: KProxy
 
 -- |The identity functor.
 data IdentityF c where IdentityF :: Category c => IdentityF c
+
+type Id = IdentityF (->)
 
 instance Category c => Functor (IdentityF (c :: k -> k -> *)) ('KProxy :: KProxy (k -> k)) where
     type Domain (IdentityF c) = c
