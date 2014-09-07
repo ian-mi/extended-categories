@@ -88,3 +88,11 @@ instance (Category c1, CoproductCategory c2) => CoproductCategory (NatTr c1 (c2 
     univCoproduct = Tagged (Sub Dict)
 
 type f :+: g = Coproduct (NatTr (->) (->)) f g
+
+data AppNat c1 c2 a where AppNat :: (Category c1, Category c2, Object c1 a) => AppNat a c1 c2
+
+instance (Category c1, Category c2, Object c1 a) => Functor (AppNat (a :: o1) (c1 :: o1 -> o1 -> *) (c2 :: o2 -> o2 -> *)) ('KProxy :: KProxy (* -> o2)) where
+    type Domain (AppNat a c1 c2) = NatTr c1 c2
+    type Codomain (AppNat a c1 c2) = c2
+    type FMap (AppNat a c1 c2) f = (FMap f a :: o2)
+    morphMap = Tagged (\(NatTr t) -> proxy t (Proxy :: Proxy a))
