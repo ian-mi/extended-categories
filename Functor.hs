@@ -61,6 +61,14 @@ instance Category c => Functor (IdentityF (c :: k -> k -> *)) ('KProxy :: KProxy
     type FMap (IdentityF c) (a :: k) = a
     morphMap = Tagged id
 
+data Dual f
+
+instance Functor f ('KProxy :: KProxy (o1 -> o2)) => Functor (Dual f) ('KProxy :: KProxy (o1 -> o2)) where
+    type Domain (Dual f) = Op (Domain f)
+    type Codomain (Dual f) = Op (Codomain f)
+    type FMap (Dual f) a = FMap f a
+    morphMap = Tagged (\(Op f) -> Op (proxy morphMap (Proxy :: Proxy f) f))
+
 -- |Functors from Prelude.Functor
 data Ftag f where Ftag :: P.Functor f => Ftag f
 
