@@ -10,6 +10,7 @@ import Functor
 import Coproduct
 import Monad
 import NatTr
+import NatTr.Coproduct
 
 data Free f a where
     Free :: FMap f (Free f a) -> Free f a

@@ -9,64 +9,63 @@ import Category
 import Category.Product
 import Functor
 import Functor.Product
+import NatTr
+import Adjoint
 import Terminal
 import Universal
 import Monoidal
 
-class Category c => ProductCategory (c :: k -> k -> *) where
-    type Product c (a :: k) (b :: k) :: k
-    univProduct :: forall (a :: k) (b :: k). Tagged '(c, a, b) ((Object c a, Object c b) :- TerminalMorphism (Diag c) (Product c a b) '(a, b))
+data ProductF (c :: o -> o -> *)
+class Adjoint c (c :><: c) (Diag c) (ProductF c) => ProductCategory c
+type Product c a b = FMap (ProductF c) '(a, b)
 
-proj :: forall a b c. (ProductCategory c, Object c a, Object c b) => (c (Product c a b) a, c (Product c a b) b)
+proj :: forall a b (c :: o -> o -> *). (ProductCategory c, Object c a, Object c b) => (c (Product c a b) a, c (Product c a b) b)
 proj = (l, r) where
-    l :><: r = t
-    t :: (c :><: c) '(Product c a b, Product c a b) '(a, b)
-    t = proxy terminalMorphism (Proxy :: Proxy '(Diag c, Product c a b)) \\ proxy univProduct (Proxy :: Proxy '(c, a, b))
+    l :><: r =  proxy morphMap (Proxy :: Proxy (AppNat '(a, b) (c :><: c) (c :><: c))) e
+    e :: NatTr (c :><: c) (c :><: c) (Comp ('KProxy :: KProxy o) (Diag c) (ProductF c)) (IdentityF (c :><: c))
+    e = counit
 
-proj1 :: forall a b c. (ProductCategory c, Object c a, Object c b) => Tagged b (c (Product c a b) a)
-proj1 = Tagged p where
-    p :><: _ = t
-    t :: (c :><: c) '(Product c a b, Product c a b) '(a, b)
-    t = proxy terminalMorphism (Proxy :: Proxy '(Diag c, Product c a b)) \\ proxy univProduct (Proxy :: Proxy '(c, a, b))
+proj1 :: forall (c :: o -> o -> *). ProductCategory c => NatTr (c :><: c) c (ProductF c) (Proj1 c c)
+proj1 = NatTr t where
+    NatTr t = (Proj1 <.> IdentityF) e
+    e :: NatTr (c :><: c) (c :><: c) (Comp ('KProxy :: KProxy o) (Diag c) (ProductF c)) (IdentityF (c :><: c))
+    e = counit
 
-proj2 :: forall a b c. (ProductCategory c, Object c a, Object c b) => Tagged a (c (Product c a b) b)
-proj2 = Tagged p where
-    _ :><: p = t
-    t :: (c :><: c) '(Product c a b, Product c a b) '(a, b)
-    t = proxy terminalMorphism (Proxy :: Proxy '(Diag c, Product c a b)) \\ proxy univProduct (Proxy :: Proxy '(c, a, b))
+proj2 :: forall (c :: o -> o -> *). ProductCategory c => NatTr (c :><: c) c (ProductF c) (Proj2 c c)
+proj2 = NatTr t where
+    NatTr t = (Proj2 <.> IdentityF) e
+    e :: NatTr (c :><: c) (c :><: c) (Comp ('KProxy :: KProxy o) (Diag c) (ProductF c)) (IdentityF (c :><: c))
+    e = counit
 
 (&&&) :: forall c a b1 b2. ProductCategory c => c a b1 -> c a b2 -> c a (Product c b1 b2)
-f &&& g
-    | Dict <- observeObjects f, Dict <- observeObjects g
-        = proxy terminalFactorization (Proxy :: Proxy (Diag c)) (f :><: g) \\ proxy univProduct (Proxy :: Proxy '(c, b1, b2))
+f &&& g | Dict <- observeObjects f = proxy phiL (Proxy :: Proxy '(Diag c, ProductF c)) (f :><: g)
 
-(***) :: ProductCategory c => c a1 b1 -> c a2 b2 -> c (Product c a1 a2) (Product c b1 b2)
-f *** g
-    | Dict <- observeObjects f, Dict <- observeObjects g = let (l, r) = proj in (f . l) &&& (g . r)
-
-data ProductF (c :: o -> o -> *)
-
-instance ProductCategory c => Functor (ProductF (c :: o -> o -> *)) ('KProxy :: KProxy ((o, o) -> o)) where
-    type Domain (ProductF c) = c :><: c
-    type Codomain (ProductF c) = c
-    type FMap (ProductF c) '(a, b) = Product c a b
-    morphMap = Tagged (\(f :><: g) -> f *** g)
+(***) :: forall c a1 a2 b1 b2. ProductCategory c => c a1 b1 -> c a2 b2 -> c (Product c a1 a2) (Product c b1 b2)
+f *** g = proxy morphMap (Proxy :: Proxy (ProductF c)) (f :><: g)
 
 instance (ProductCategory c, Terminal c) => Monoidal c (ProductF c) where
     type I (ProductF c) = T c
 
-instance TerminalMorphism (Diag (->)) (a, b) '(a, b) where
-    terminalMorphism = Tagged (P.fst :><: P.snd)
-    terminalFactorization  = Tagged (\(f :><: g) z -> (f z, g z))
+instance Functor (ProductF (->)) ('KProxy :: KProxy ((*,*) -> *)) where
+    type Domain (ProductF (->)) = (->) :><: (->)
+    type Codomain (ProductF (->)) = (->)
+    type FMap (ProductF (->)) '(a, b) = (a, b)
+    morphMap = Tagged (\(f :><: g) -> let (l, r) = proj in (f . l) &&& (g . r))
 
-instance ProductCategory (->) where
-    type Product (->) a b = (a, b)
-    univProduct = Tagged (Sub Dict)
+instance Adjoint (->) ((->) :><: (->)) (Diag (->)) (ProductF (->)) where
+    leftAdjunct = NatTr (Tagged (\(f :><: g) z -> (f z, g z)))
+    rightAdjunct = NatTr (Tagged (\f -> (P.fst . f) :><: (P.snd . f)))
 
-instance TerminalMorphism (Diag (:-)) ((a :: Constraint), b) '(a, b) where
-    terminalMorphism = Tagged (Sub Dict :><: Sub Dict)
-    terminalFactorization = Tagged (\(f :><: g) -> Sub (Dict \\ f \\ g))
+instance ProductCategory (->)
 
-instance ProductCategory (:-) where
-    type Product (:-) a b = ((a, b) :: Constraint)
-    univProduct = Tagged (Sub Dict)
+instance Functor (ProductF (:-)) ('KProxy :: KProxy ((Constraint, Constraint) -> Constraint)) where
+    type Domain (ProductF (:-)) = (:-) :><: (:-)
+    type Codomain (ProductF (:-)) = (:-)
+    type FMap (ProductF (:-)) '((a :: Constraint), (b :: Constraint)) = ((a, b) :: Constraint)
+    morphMap = Tagged (\(f :><: g) -> let (l, r) = proj in (f . l) &&& (g . r))
+
+instance Adjoint (:-) ((:-) :><: (:-)) (Diag (:-)) (ProductF (:-)) where
+    leftAdjunct = NatTr (Tagged (\(f :><: g) -> Sub (Dict \\ f \\ g)))
+    rightAdjunct = NatTr (Tagged (\f -> (Sub (Dict \\ f) :><: Sub (Dict \\ f))))
+
+instance ProductCategory (:-)
