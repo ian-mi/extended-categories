@@ -1,4 +1,4 @@
-module NaturalTransformation where
+module NatTr where
 
 import Data.Constraint hiding ((&&&))
 import Data.Tagged

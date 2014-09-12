@@ -7,7 +7,7 @@ import Data.Tagged
 
 import Category
 import Functor
-import NaturalTransformation
+import NatTr
 
 class EndoFunctorOf t c => Monad t (c :: o -> o -> *) | t -> c where
     nu :: NatTr c c (IdentityF c) t

@@ -9,7 +9,7 @@ import Category
 import Functor
 import Coproduct
 import Monad
-import NaturalTransformation
+import NatTr
 
 data Free f a where
     Free :: FMap f (Free f a) -> Free f a
