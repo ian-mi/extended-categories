@@ -8,6 +8,7 @@ import Data.Proxy
 import Category
 import Category.Product
 import Functor
+import Functor.Product
 import Universal
 
 class Category c => CoproductCategory (c :: o -> o -> *) where

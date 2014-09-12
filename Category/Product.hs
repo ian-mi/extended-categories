@@ -1,11 +1,8 @@
 module Category.Product where
 
 import Data.Constraint
-import Data.Proxy
-import Data.Tagged
 
 import Category
-import Functor
 
 data (c1 :><: c2) a b where
     (:><:) :: (a ~ '(L a, R a), b ~ '(L b, R b))  => c1 (L a) (L b) -> c2 (R a) (R b) -> (c1 :><: c2) a b
@@ -19,11 +16,3 @@ instance (Category c1, Category c2) => Category (c1 :><: c2) where
     observeObjects (f :><: g)
         | Dict <- observeObjects f, Dict <- observeObjects g = Dict
     (f1 :><: f2) . (g1 :><: g2) = (f1 . g1) :><: (f2 . g2)
-
-data Diag c where Diag :: Category c => Diag c
-
-instance Category c => Functor (Diag (c :: k -> k -> *)) ('KProxy :: KProxy (k -> (k, k))) where
-    type Domain (Diag c) = c
-    type Codomain (Diag c) = c :><: c
-    type FMap (Diag c) (a :: k) = '(a, a)
-    morphMap = Tagged (\f -> f :><: f)

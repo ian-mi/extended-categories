@@ -8,6 +8,7 @@ import Data.Tagged
 import Category
 import Category.Product
 import Functor
+import Functor.Product
 import Terminal
 import Universal
 import Monoidal
