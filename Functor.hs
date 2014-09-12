@@ -6,6 +6,7 @@ import Data.Proxy
 import Data.Tagged
 
 import Category
+import Category.Product
 
 -- |The class of functors @f@ from @Domain f@ to @Codomain f@. Rather than
 -- indexing functors on the type of their object mapping, Functor is indexed on
@@ -68,6 +69,14 @@ instance Functor f ('KProxy :: KProxy (o1 -> o2)) => Functor (Dual f) ('KProxy :
     type Codomain (Dual f) = Op (Codomain f)
     type FMap (Dual f) a = FMap f a
     morphMap = Tagged (\(Op f) -> Op (proxy morphMap (Proxy :: Proxy f) f))
+
+data Hom c
+
+instance Category c => Functor (Hom (c :: o -> o -> *)) ('KProxy :: KProxy ((o, o) -> *)) where
+    type Domain (Hom c) = Op c :><: c
+    type Codomain (Hom c) = (->)
+    type FMap (Hom c) '(a, b) = c a b
+    morphMap = Tagged (\(Op f :><: g) h -> g . h . f)
 
 -- |Functors from Prelude.Functor
 data Ftag f where Ftag :: P.Functor f => Ftag f
