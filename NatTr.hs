@@ -7,7 +7,6 @@ import Data.Proxy
 import Category
 import Category.Product
 import Functor
-import Functor.Product
 
 data NatTr (c1 :: o1 -> o1 -> *) (c2 :: o2 -> o2 -> *) (f :: *) (g :: *) where
     NatTr :: (Object (NatTr c1 c2) f, Object (NatTr c1 c2) g) =>
@@ -68,3 +67,53 @@ instance (Category c1, Category c2, Object c1 a) => Functor (AppNat (a :: o1) (c
     type Codomain (AppNat a c1 c2) = c2
     type FMap (AppNat a c1 c2) f = (FMap f a :: o2)
     morphMap = Tagged (\(NatTr t) -> proxy t (Proxy :: Proxy a))
+
+idL :: forall f. Functor f ('KProxy :: KProxy (o1 -> o2)) =>
+    NatTr (Domain f :: o1 -> o1 -> *) (Codomain f :: o2 -> o2 -> *) (Comp ('KProxy :: KProxy o2) (IdentityF (Codomain f :: o2 -> o2 -> *)) f) f
+idL = NatTr t where
+    t :: forall (a :: o1). Object (Domain f) a => Tagged a (Codomain f (FMap f a :: o2) (FMap f a :: o2))
+    t = Tagged (id \\ proxy objectMap (Proxy :: Proxy '(f, a)))
+
+idLInv :: forall f. Functor f ('KProxy :: KProxy (o1 -> o2)) =>
+    NatTr (Domain f :: o1 -> o1 -> *) (Codomain f :: o2 -> o2 -> *) f (Comp ('KProxy :: KProxy o2) (IdentityF (Codomain f :: o2 -> o2 -> *)) f)
+idLInv = NatTr t where
+    t :: forall (a :: o1). Object (Domain f) a => Tagged a (Codomain f (FMap f a :: o2) (FMap f a :: o2))
+    t = Tagged (id \\ proxy objectMap (Proxy :: Proxy '(f, a)))
+
+idR :: forall f. Functor f ('KProxy :: KProxy (o1 -> o2)) =>
+    NatTr (Domain f :: o1 -> o1 -> *) (Codomain f :: o2 -> o2 -> *) (Comp ('KProxy :: KProxy o1) f (IdentityF (Domain f :: o1 -> o1 -> *))) f
+idR = NatTr t where
+    t :: forall (a :: o1). Object (Domain f) a => Tagged a (Codomain f (FMap f a :: o2) (FMap f a :: o2))
+    t = Tagged (id \\ proxy objectMap (Proxy :: Proxy '(f, a)))
+
+idRInv :: forall f. Functor f ('KProxy :: KProxy (o1 -> o2)) =>
+    NatTr (Domain f :: o1 -> o1 -> *) (Codomain f :: o2 -> o2 -> *) f (Comp ('KProxy :: KProxy o1) f (IdentityF (Domain f :: o1 -> o1 -> *)))
+idRInv = NatTr t where
+    t :: forall (a :: o1). Object (Domain f) a => Tagged a (Codomain f (FMap f a :: o2) (FMap f a :: o2))
+    t = Tagged (id \\ proxy objectMap (Proxy :: Proxy '(f, a)))
+
+assocL :: forall f g h.
+    (Functor f ('KProxy :: KProxy (o3 -> o4)), Functor g ('KProxy :: KProxy (o2 -> o3)), Functor h ('KProxy :: KProxy (o1 -> o2)),
+    (Domain f :: o3 -> o3 -> *) ~ Codomain g, (Domain g :: o2 -> o2 -> *) ~ Codomain h) =>
+        NatTr (Domain h :: o1 -> o1 -> *) (Codomain f :: o4 -> o4 -> *)
+            (Comp ('KProxy :: KProxy o3) f (Comp ('KProxy :: KProxy o2) g h))
+            (Comp ('KProxy :: KProxy o2) (Comp ('KProxy :: KProxy o3) f g) h)
+assocL = NatTr t where
+    t :: forall (a :: o1). Object (Domain h) a => Tagged a (Codomain f (FMap f (FMap g (FMap h a :: o2) :: o3) :: o4) (FMap f (FMap g (FMap h a :: o2) :: o3) :: o4))
+    t = Tagged (id \\
+                    proxy objectMap (Proxy :: Proxy '(f, (FMap g (FMap h a :: o2) :: o3))) .
+                    proxy objectMap (Proxy :: Proxy '(g, (FMap h a :: o2))) .
+                    proxy objectMap (Proxy :: Proxy '(h, a)))
+
+assocR :: forall f g h.
+    (Functor f ('KProxy :: KProxy (o3 -> o4)), Functor g ('KProxy :: KProxy (o2 -> o3)), Functor h ('KProxy :: KProxy (o1 -> o2)),
+    (Domain f :: o3 -> o3 -> *) ~ Codomain g, (Domain g :: o2 -> o2 -> *) ~ Codomain h) =>
+        NatTr (Domain h :: o1 -> o1 -> *) (Codomain f :: o4 -> o4 -> *)
+            (Comp ('KProxy :: KProxy o2) (Comp ('KProxy :: KProxy o3) f g) h)
+            (Comp ('KProxy :: KProxy o3) f (Comp ('KProxy :: KProxy o2) g h))
+assocR = NatTr t where
+    t :: forall (a :: o1). Object (Domain h) a => Tagged a (Codomain f (FMap f (FMap g (FMap h a :: o2) :: o3) :: o4) (FMap f (FMap g (FMap h a :: o2) :: o3) :: o4))
+    t = Tagged (id \\
+                    proxy objectMap (Proxy :: Proxy '(f, (FMap g (FMap h a :: o2) :: o3))) .
+                    proxy objectMap (Proxy :: Proxy '(g, (FMap h a :: o2))) .
+                    proxy objectMap (Proxy :: Proxy '(h, a)))
