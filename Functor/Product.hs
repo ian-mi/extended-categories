@@ -6,6 +6,7 @@ import Data.Tagged
 import Category
 import Category.Product
 import Functor
+import NatTr
 
 data f :&&&: g
 
@@ -42,7 +43,6 @@ instance (Functor f ('KProxy :: KProxy (o1 -> o2)), Functor g ('KProxy :: KProxy
     type FMap (f :***: g) '((a :: o1), (b :: o2)) = '(FMap f a, FMap g b)
     morphMap = Tagged (\(f :><: g) -> proxy morphMap (Proxy :: Proxy f) f :><: proxy morphMap (Proxy :: Proxy g) g)
 
-
 data Diag c where Diag :: Category c => Diag c
 
 instance Category c => Functor (Diag (c :: k -> k -> *)) ('KProxy :: KProxy (k -> (k, k))) where
@@ -50,3 +50,15 @@ instance Category c => Functor (Diag (c :: k -> k -> *)) ('KProxy :: KProxy (k -
     type Codomain (Diag c) = c :><: c
     type FMap (Diag c) (a :: k) = '(a, a)
     morphMap = Tagged (\f -> f :><: f)
+
+retractProj1 :: Category (c :: o -> o -> *) => NatTr c c (Comp ('KProxy :: KProxy (o, o)) (Proj1 c c) (Diag c)) (IdentityF c)
+retractProj1 = NatTr (Tagged id)
+
+retractProj1Inv :: Category (c :: o -> o -> *) => NatTr c c (IdentityF c) (Comp ('KProxy :: KProxy (o, o)) (Proj1 c c) (Diag c))
+retractProj1Inv = NatTr (Tagged id)
+
+retractProj2 :: Category (c :: o -> o -> *) => NatTr c c (Comp ('KProxy :: KProxy (o, o)) (Proj2 c c) (Diag c)) (IdentityF c)
+retractProj2 = NatTr (Tagged id)
+
+retractProj2Inv :: Category (c :: o -> o -> *) => NatTr c c (IdentityF c) (Comp ('KProxy :: KProxy (o, o)) (Proj2 c c) (Diag c))
+retractProj2Inv = NatTr (Tagged id)
