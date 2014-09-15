@@ -26,16 +26,10 @@ proj = (l, r) where
     e = counit
 
 proj1 :: forall (c :: o -> o -> *). ProductCategory c => NatTr (c :><: c) c (ProductF c) (Proj1 c c)
-proj1 = NatTr t where
-    NatTr t = (Proj1 <.> IdentityF) e
-    e :: NatTr (c :><: c) (c :><: c) (Comp ('KProxy :: KProxy o) (Diag c) (ProductF c)) (IdentityF (c :><: c))
-    e = counit
+proj1 = idR . compFL counit . assocR . compFR retractProj1Inv . idLInv
 
 proj2 :: forall (c :: o -> o -> *). ProductCategory c => NatTr (c :><: c) c (ProductF c) (Proj2 c c)
-proj2 = NatTr t where
-    NatTr t = (Proj2 <.> IdentityF) e
-    e :: NatTr (c :><: c) (c :><: c) (Comp ('KProxy :: KProxy o) (Diag c) (ProductF c)) (IdentityF (c :><: c))
-    e = counit
+proj2 = idR . compFL counit . assocR . compFR retractProj2Inv . idLInv
 
 (&&&) :: forall c a b1 b2. ProductCategory c => c a b1 -> c a b2 -> c a (Product c b1 b2)
 f &&& g | Dict <- observeObjects f = proxy phiL (Proxy :: Proxy '(Diag c, ProductF c)) (f :><: g)
