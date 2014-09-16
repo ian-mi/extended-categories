@@ -17,7 +17,7 @@ instance (Category c1, ProductCategory c2) => Functor (ProductF (NatTr c1 (c2 ::
     type Domain (ProductF (NatTr c1 c2)) = NatTr c1 c2 :><: NatTr c1 c2
     type Codomain (ProductF (NatTr c1 c2)) = NatTr c1 c2
     type FMap (ProductF (NatTr c1 c2)) '((f :: *), (g :: *)) = Comp ('KProxy :: KProxy (o2, o2)) (ProductF c2) (f :&&&: g)
-    morphMap = Tagged (\t@(f :><: g) -> case observeObjects t of Dict -> let (l, r) = proj in (f . l) &&& (g . r))
+    morphMap = Tagged (\t@(f :><: g) -> case observeObjects t of Dict -> (f . appNat proj1) &&& (g . appNat proj2))
 
 instance (Category c1, ProductCategory c2) =>
         Adjoint (NatTr c1 c2) (NatTr (c1 :: o1 -> o1 -> *) (c2 :: o2 -> o2 -> *) :><: NatTr c1 c2) (Diag (NatTr c1 c2)) (ProductF (NatTr c1 c2)) where

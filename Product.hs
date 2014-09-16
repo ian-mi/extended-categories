@@ -19,12 +19,6 @@ data ProductF (c :: o -> o -> *)
 class Adjoint c (c :><: c) (Diag c) (ProductF c) => ProductCategory c
 type Product c a b = FMap (ProductF c) '(a, b)
 
-proj :: forall a b (c :: o -> o -> *). (ProductCategory c, Object c a, Object c b) => (c (Product c a b) a, c (Product c a b) b)
-proj = (l, r) where
-    l :><: r =  proxy morphMap (Proxy :: Proxy (AppNat '(a, b) (c :><: c) (c :><: c))) e
-    e :: NatTr (c :><: c) (c :><: c) (Comp ('KProxy :: KProxy o) (Diag c) (ProductF c)) (IdentityF (c :><: c))
-    e = counit
-
 proj1 :: forall (c :: o -> o -> *). ProductCategory c => NatTr (c :><: c) c (ProductF c) (Proj1 c c)
 proj1 = idR . compFL counit . assocR . compFR retractProj1Inv . idLInv
 
@@ -44,7 +38,7 @@ instance Functor (ProductF (->)) ('KProxy :: KProxy ((*,*) -> *)) where
     type Domain (ProductF (->)) = (->) :><: (->)
     type Codomain (ProductF (->)) = (->)
     type FMap (ProductF (->)) '(a, b) = (a, b)
-    morphMap = Tagged (\(f :><: g) -> let (l, r) = proj in (f . l) &&& (g . r))
+    morphMap = Tagged (\(f :><: g) -> (f . appNat proj1) &&& (g . appNat proj2))
 
 instance Adjoint (->) ((->) :><: (->)) (Diag (->)) (ProductF (->)) where
     leftAdjunct = NatTr (Tagged (\(f :><: g) z -> (f z, g z)))
@@ -56,7 +50,7 @@ instance Functor (ProductF (:-)) ('KProxy :: KProxy ((Constraint, Constraint) ->
     type Domain (ProductF (:-)) = (:-) :><: (:-)
     type Codomain (ProductF (:-)) = (:-)
     type FMap (ProductF (:-)) '((a :: Constraint), (b :: Constraint)) = ((a, b) :: Constraint)
-    morphMap = Tagged (\(f :><: g) -> let (l, r) = proj in (f . l) &&& (g . r))
+    morphMap = Tagged (\(f :><: g) -> (f . appNat proj1) &&& (g . appNat proj2))
 
 instance Adjoint (:-) ((:-) :><: (:-)) (Diag (:-)) (ProductF (:-)) where
     leftAdjunct = NatTr (Tagged (\(f :><: g) -> Sub (Dict \\ f \\ g)))
