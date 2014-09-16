@@ -1,3 +1,5 @@
+{-# LANGUAGE AllowAmbiguousTypes #-}
+
 module NatTr where
 
 import Data.Constraint hiding ((&&&))
@@ -11,6 +13,9 @@ import Functor
 data NatTr (c1 :: o1 -> o1 -> *) (c2 :: o2 -> o2 -> *) (f :: *) (g :: *) where
     NatTr :: (Object (NatTr c1 c2) f, Object (NatTr c1 c2) g) =>
         (forall (a :: o1). Object c1 a => Tagged a (c2 (FMap f a :: o2) (FMap g a :: o2))) -> NatTr (c1 :: o1 -> o1 -> *) (c2 :: o2 -> o2 -> *) f g
+
+appNat :: forall c1 c2 f g a. Object c1 a => NatTr c1 c2 f g -> c2 (FMap f a) (FMap g a)
+appNat (NatTr t) = proxy t (Proxy :: Proxy a)
 
 instance (Category c1, Category c2) => Category (NatTr (c1 :: o1 -> o1 -> *) (c2 :: o2 -> o2 -> *)) where
     type Object (NatTr c1 c2) f = FunctorOf f c1 c2
