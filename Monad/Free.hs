@@ -25,8 +25,8 @@ pureT = NatTr (Tagged Pure)
 unfreeT :: forall f. EndoFunctorOf f (->) => NatTr (->) (->) (Ftag (Free f)) ((f :.: Ftag (Free f)) :+: Id)
 unfreeT = NatTr (Tagged t) where
     t :: forall a. Free f a -> FMap ((f :.: Ftag (Free f)) :+: Id) a
-    t (Free f) = untag inj1 f
-    t (Pure a) = untag inj2 a
+    t (Free f) = appNat inj1 f
+    t (Pure a) = appNat inj2 a
 
 instance EndoFunctorOf f (->) => P.Functor (Free f) where
     fmap t = go where
